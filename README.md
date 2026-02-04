@@ -56,10 +56,7 @@ Global Exception Handler
 
 Base URL:
 
-http://localhost:8080/api/models
-
-
----
+https://test-api-yqgd.onrender.com
 
 #  1. Create Model
 
