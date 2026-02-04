@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Model API UI</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f4f6f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-add {
+            background: green;
+            color: white;
+        }
+
+        .btn-load {
+            background: blue;
+            color: white;
+        }
+
+        .btn-delete {
+            background: red;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1> Model Management UI</h1>
+
+<div class="container">
+
+    <h2>Add New Model</h2>
+
+    <input type="text" id="name" placeholder="Enter Name">
+    <input type="text" id="description" placeholder="Enter Description">
+    <input type="number" id="price" placeholder="Enter Price">
+    <input type="text" id="category" placeholder="Enter Category">
+
+    <button class="btn-add" onclick="addModel()">➕ Add Model</button>
+
+    <hr>
+
+    <h2>All Models</h2>
+
+    <button class="btn-load" onclick="loadModels()">📌 Load Models</button>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+
+        <tbody id="modelTable"></tbody>
+    </table>
+
+</div>
+
+<script>
+    const API_URL = "/api/models";
+
+    // ✅ Load All Models
+    async function loadModels() {
+        let response = await fetch(API_URL);
+        let models = await response.json();
+
+        let table = document.getElementById("modelTable");
+        table.innerHTML = "";
+
+        models.forEach(model => {
+            table.innerHTML += `
+                <tr>
+                    <td>${model.id}</td>
+                    <td>${model.name}</td>
+                    <td>${model.description}</td>
+                    <td>${model.price}</td>
+                    <td>${model.category}</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteModel(${model.id})">
+                            ❌ Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // ✅ Add Model
+    async function addModel() {
+
+        let modelData = {
+            name: document.getElementById("name").value,
+            description: document.getElementById("description").value,
+            price: document.getElementById("price").value,
+            category: document.getElementById("category").value
+        };
+
+        let response = await fetch(API_URL, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(modelData)
+        });
+
+        if (response.ok) {
+            alert("✅ Model Added Successfully!");
+            loadModels();
+        } else {
+            alert("❌ Validation Error! Please fill all fields correctly.");
+        }
+    }
+
+    // ✅ Delete Model
+    async function deleteModel(id) {
+        let response = await fetch(`${API_URL}/${id}`, {
+            method: "DELETE"
+        });
+
+        if (response.ok) {
+            alert("✅ Model Deleted Successfully!");
+            loadModels();
+        } else {
+            alert("❌ Error deleting model");
+        }
+    }
+
+    // Auto Load on Page Open
+    loadModels();
+</script>
+
+</body>
+</html>
